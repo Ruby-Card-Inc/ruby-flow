@@ -12,7 +12,19 @@ Please look at [Installation and Requirements](https://reactflow.dev/learn/getti
 
 For the purpose of simplifying the backend for this assignment, we are going to use [Instant DB](https://www.instantdb.com/) to facilitate CRUD operations without the need of writing our own API. Instant DB is very similar to firebase.
 
+This is what the Instant DB tables look like
+
+<img width="1311" alt="image" src="https://github.com/user-attachments/assets/3bf48d47-bdcc-405a-b61c-660c012a1cfa">
+
+The reason we are using instant db is because it is flexible and can accept crud oeprations of objects of any types.
+
+## Problems in this implementation that you need to fix
+
+- We are calling an update operation everytime you drag and drop a node. Optimize this so we make as little updates as possible.
+
 ## Task
+
+![image](https://github.com/user-attachments/assets/163cb439-3b78-4322-a7c4-c0382c8c7749)
 
 Based on the image provided, which shows a workflow for a music subscription service, I can propose a similar AI workflow assignment related to financial accounts and spend control for a fintech application. Here's a concept:
 Title: AI-Driven Spend Control and Financial Wellness Platform
