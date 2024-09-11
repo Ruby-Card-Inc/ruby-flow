@@ -8,6 +8,13 @@ This is a basic react flow app that was cloned using the following command:
 npx degit xyflow/vite-react-flow-template ruby-flow
 ```
 
+To run the app, please use the following commands:
+
+```
+npm install
+npm run dev
+```
+
 Please look at [Installation and Requirements](https://reactflow.dev/learn/getting-started/installation-and-requirements) for more information
 
 For the purpose of simplifying the backend for this assignment, we are going to use [Instant DB](https://www.instantdb.com/) to facilitate CRUD operations without the need of writing our own API. This way, we can focus the task on primarily frontend skills while simulating the needs for data consistency and persistance. Instant DB is very similar to firebase, you can upsert an array of nested objects to tables that don't exist, and the table will be automatically created and the data will automatically insert as well.
