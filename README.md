@@ -55,6 +55,16 @@ The use of AI in this workflow is as follows but not limited to:
 
 Due to the sensitive nature of this project, we are not going to provide any real data for this assignment.
 
+## Tech Stack
+
+Feel free to use any react based tech stack you want, and are comfortable with. However, using any of the following libraries/technologies is highly recommended:
+
+- [React Flow](https://reactflow.dev/)
+- [Typescript](https://www.typescriptlang.org/)
+- [Instant DB](https://www.instantdb.com/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [ShadCN](https://ui.shadcn.com/)
+
 ## Bonus Points
 
 Feel free to add any bonus points that you think are relevant to the project. Here are some ideas:
