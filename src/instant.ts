@@ -1,8 +1,7 @@
 import { init, tx } from "@instantdb/react";
 import { AppNode } from "./nodes/types";
-
-// enter your own instantdb app id here
-export const APP_ID = "a00b1ff5-793e-429a-8607-6dcc04e92d01";
+import { debounce } from "lodash";
+export const APP_ID = "b3b3f399-fa4f-4f31-bde3-71d5d8d467cf";
 
 type Schema = {
   nodes: AppNode[];
@@ -10,6 +9,13 @@ type Schema = {
 
 export const db = init<Schema>({ appId: APP_ID });
 
-export function updateNodes(nodes: AppNode[]) {
+const debouncedUpdate = debounce((nodes: AppNode[]) => {
   db.transact(nodes.map((node) => tx.nodes[node.id].update({ ...node })));
+}, 300);
+
+export function updateNodes(nodes: AppNode[]) {
+  debouncedUpdate(nodes);
+}
+export function cancelPendingUpdates() {
+  debouncedUpdate.cancel();
 }

@@ -9,8 +9,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@instantdb/react": "^0.12.30",
+    "@instantdb/react": "^0.12.32",
     "@xyflow/react": "^12.2.0",
+    "lodash": "^4.17.21",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
