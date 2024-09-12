@@ -184,21 +184,24 @@ function Flow() {
   const onNodesChangeWrapper = React.useCallback(
     (changes) => {
       onNodesChange(changes);
-      setNodes((nds) => {
-        const updatedNodes = nds.map((node) => {
-          const change = changes.find(
-            (c) => c.id === node.id && c.type === "position"
-          );
-          if (change) {
-            return { ...node, position: change.position };
-          }
-          return node;
+      const positionChanges = changes.filter(
+        (change) => change.type === "position" && change.dragging === false
+      );
+      if (positionChanges.length > 0) {
+        setNodes((nds) => {
+          const updatedNodes = nds.map((node) => {
+            const change = positionChanges.find((c) => c.id === node.id);
+            if (change) {
+              return { ...node, position: change.position };
+            }
+            return node;
+          });
+          updateNodes(updatedNodes);
+          return updatedNodes;
         });
-        updateNodes(updatedNodes);
-        return updatedNodes;
-      });
+      }
     },
-    [onNodesChange]
+    [onNodesChange, setNodes]
   );
 
   const addNode = React.useCallback(() => {

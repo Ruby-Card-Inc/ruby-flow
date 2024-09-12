@@ -2,6 +2,7 @@ import { init, tx } from "@instantdb/react";
 import { debounce } from "lodash";
 import { Node, Edge } from "@xyflow/react";
 import { id } from "@instantdb/react";
+import { isEqual } from "lodash";
 export const APP_ID = "b3b3f399-fa4f-4f31-bde3-71d5d8d467cf";
 
 type Schema = {
@@ -20,10 +21,14 @@ const debouncedUpdateNodes = debounce((nodes: Node[]) => {
 
   console.log(updatedNodes);
   db.transact(updatedNodes.map((node) => tx.nodes[node.id].update(node)));
-}, 300);
+}, 1000);
+let prevNodes: Node[] = [];
 
 export function updateNodes(nodes: Node[]) {
-  debouncedUpdateNodes(nodes);
+  if (!isEqual(nodes, prevNodes)) {
+    prevNodes = [...nodes];
+    debouncedUpdateNodes(nodes);
+  }
 }
 
 export function updateEdges(edge: any) {
