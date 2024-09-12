@@ -1,0 +1,59 @@
+.custom-node {
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+  background: white;
+  width: 200px;
+}
+
+.node-title {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.node-subtitle {
+  font-size: 0.9em;
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.node-link {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.progress-bar {
+  height: 10px;
+  background: #eee;
+  margin-bottom: 5px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #4caf50;
+}
+
+.progress-text {
+  font-size: 0.8em;
+  color: #666;
+}
+
+.status-tag {
+  display: inline-block;
+  padding: 2px 5px;
+  border-radius: 3px;
+  font-size: 0.8em;
+  margin-top: 10px;
+}
+
+.status-tag.todo {
+  background: #ffd700;
+}
+
+.status-tag.in-progress {
+  background: #87cefa;
+}
+
+.status-tag.done {
+  background: #90ee90;
+}
