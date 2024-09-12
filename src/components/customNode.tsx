@@ -12,6 +12,25 @@ interface ProgressNodeProps {
   };
 }
 const ProgressNode: React.FC<ProgressNodeProps> = ({ data }) => {
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case "todo":
+        return "#ffd700";
+      case "in progress":
+        return "#3498db";
+      case "done":
+        return "#2ecc71";
+      default:
+        return "#95a5a6";
+    }
+  };
+
+  const getProgressColor = (progress: number) => {
+    if (progress < 30) return "#e74c3c";
+    if (progress < 70) return "#f39c12";
+    return "#2ecc71";
+  };
+
   return (
     <div className="custom-node">
       <Handle type="target" position={Position.Top} />
@@ -22,25 +41,37 @@ const ProgressNode: React.FC<ProgressNodeProps> = ({ data }) => {
       <div className="node-content">
         <h3 className="node-title">{data.title}</h3>
         <p className="node-subtitle">{data.subtitle}</p>
+
+        <div className="progress-section">
+          <div className="progress-bar">
+            <div
+              className="progress-fill"
+              style={{
+                width: `${data.progress}%`,
+                backgroundColor: getProgressColor(data.progress),
+              }}
+            ></div>
+          </div>
+          <span className="progress-text">{data.progress}%</span>
+        </div>
+
+        <div className="status-section">
+          <div
+            className="status-tag"
+            style={{ backgroundColor: getStatusColor(data.status) }}
+          >
+            {data.status}
+          </div>
+        </div>
+
         <a href={data.detailsLink} className="node-link">
           Details
         </a>
-
-        <div className="progress-bar">
-          <div
-            className="progress-fill"
-            style={{ width: `${data.progress}%` }}
-          ></div>
-        </div>
-        <span className="progress-text">{data.progress}%</span>
-
-        <div className={`status-tag ${data.status.replace(" ", "-")}`}>
-          {data.status}
-        </div>
       </div>
     </div>
   );
 };
+
 type DataItem = {
   time: string;
   data: string;

@@ -13,7 +13,14 @@ type Schema = {
 export const db = init<Schema>({ appId: APP_ID });
 
 const debouncedUpdateNodes = debounce((nodes: Node[]) => {
-  db.transact(nodes.map((node) => tx.nodes[node.id].update(node)));
+  console.log("Call", nodes);
+  const updatedNodes = nodes.map((node) => {
+    const { measured, ...rest } = node;
+    return rest;
+  });
+
+  console.log(updatedNodes);
+  db.transact(updatedNodes.map((node) => tx.nodes[node.id].update(node)));
 }, 300);
 
 export function updateNodes(nodes: Node[]) {
@@ -30,6 +37,19 @@ export function updateEdges(edges: any) {
       target: edges.target,
     }),
   ]);
+}
+
+export function addNodeDB(node: any) {
+  const data = {
+    data: node.data,
+    dragging: true,
+    label: node.data.title,
+    node_type: node.type,
+    position: node.position,
+    type: node.type,
+    selected: false,
+  };
+  db.transact([tx.nodes[id()].update(data)]);
 }
 
 export function cancelPendingUpdates() {

@@ -18,7 +18,6 @@ const graph = i.graph(
       dragging: i.any(),
       label: i.any(),
       logo: i.any(),
-      measured: i.any(),
       node_type: i.any(),
       position: i.any(),
       progress: i.any(),
