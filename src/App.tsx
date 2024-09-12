@@ -37,7 +37,7 @@ import { Slider } from "@/components/ui/slider";
 
 import { nodeTypes } from "./nodes";
 import { db, updateNodes, updateEdges, addNodeDB } from "./instant";
-
+import { deleteNodeDB, deleteEdgeDB } from "./instant";
 const CustomDottedEdge: React.FC<EdgeProps> = ({
   id,
   sourceX,
@@ -116,9 +116,9 @@ function Flow() {
   const [edges, setEdges, onEdgesChange] = useEdgesState<any>([]);
   const [isNodeDialogOpen, setIsNodeDialogOpen] = React.useState(false);
   const [isEdgeDialogOpen, setIsEdgeDialogOpen] = React.useState(false);
-  const [nodeType, setNodeType] = React.useState<"progress" | "stats" | null>(
-    null
-  );
+  const [nodeType, setNodeType] = React.useState<
+    "progress" | "stats" | "data" | "ai" | "end" | null
+  >(null);
   const [formData, setFormData] = React.useState<any>({});
   const [dataItems, setDataItems] = React.useState<any[]>([]);
 
@@ -202,22 +202,49 @@ function Flow() {
   );
 
   const addNode = React.useCallback(() => {
-    const newNode =
-      nodeType === "progress"
-        ? {
-            id: `node-${Date.now()}`,
-            type: "ProgressNode",
-            data: { ...formData, progress: Number(formData.progress) },
-            position: { x: Math.random() * 500, y: Math.random() * 500 },
-          }
-        : nodeType === "stats"
-        ? {
-            id: `node-${Date.now()}`,
-            type: "StatsNode",
-            data: { ...formData, dataItems },
-            position: { x: Math.random() * 500, y: Math.random() * 500 },
-          }
-        : null;
+    let newNode;
+    switch (nodeType) {
+      case "progress":
+        newNode = {
+          id: `node-${Date.now()}`,
+          type: "ProgressNode",
+          data: { ...formData, progress: Number(formData.progress) },
+          position: { x: Math.random() * 500, y: Math.random() * 500 },
+        };
+        break;
+      case "stats":
+        newNode = {
+          id: `node-${Date.now()}`,
+          type: "StatsNode",
+          data: { ...formData, dataItems },
+          position: { x: Math.random() * 500, y: Math.random() * 500 },
+        };
+        break;
+      case "data":
+        newNode = {
+          id: `node-${Date.now()}`,
+          type: "DataNode",
+          data: { ...formData, dataItems },
+          position: { x: Math.random() * 500, y: Math.random() * 500 },
+        };
+        break;
+      case "ai":
+        newNode = {
+          id: `node-${Date.now()}`,
+          type: "AINode",
+          data: { ...formData, confidence: Number(formData.confidence) },
+          position: { x: Math.random() * 500, y: Math.random() * 500 },
+        };
+        break;
+      case "end":
+        newNode = {
+          id: `node-${Date.now()}`,
+          type: "EndNode",
+          data: { ...formData },
+          position: { x: Math.random() * 500, y: Math.random() * 500 },
+        };
+        break;
+    }
 
     if (newNode) {
       setNodes((nds) => [...nds, newNode]);
@@ -229,6 +256,14 @@ function Flow() {
     setFormData({});
     setDataItems([]);
   }, [nodeType, formData, dataItems]);
+
+  const onNodesDelete = React.useCallback((deleted) => {
+    deleted.forEach((node) => deleteNodeDB(node.id));
+  }, []);
+
+  const onEdgesDelete = React.useCallback((deleted) => {
+    deleted.forEach((edge) => deleteEdgeDB(edge.id));
+  }, []);
 
   const handleInputChange = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -243,11 +278,11 @@ function Flow() {
   }, []);
 
   const addDataItem = React.useCallback(() => {
-    setDataItems((prev) => [...prev, { time: "", data: "", change: "" }]);
+    setDataItems((prev) => [...prev, { label: "", value: "" }]);
   }, []);
 
   const updateDataItem = React.useCallback(
-    (index: number, field: "data" | "time" | "change", value: string) => {
+    (index: number, field: string, value: string) => {
       setDataItems((prev) => {
         const newDataItems = [...prev];
         newDataItems[index] = { ...newDataItems[index], [field]: value };
@@ -270,7 +305,7 @@ function Flow() {
           </DialogHeader>
           <Select
             onValueChange={(value) =>
-              setNodeType(value as "progress" | "stats")
+              setNodeType(value as "progress" | "stats" | "data" | "ai" | "end")
             }
           >
             <SelectTrigger>
@@ -279,6 +314,9 @@ function Flow() {
             <SelectContent>
               <SelectItem value="progress">Progress Node</SelectItem>
               <SelectItem value="stats">Stats Node</SelectItem>
+              <SelectItem value="data">Data Node</SelectItem>
+              <SelectItem value="ai">AI Node</SelectItem>
+              <SelectItem value="end">End Node</SelectItem>
             </SelectContent>
           </Select>
           {nodeType === "progress" && (
@@ -342,6 +380,71 @@ function Flow() {
                 </div>
               ))}
               <Button onClick={addDataItem}>Add Data Item</Button>
+            </>
+          )}
+          {nodeType === "data" && (
+            <>
+              <Label htmlFor="title">Title</Label>
+              <Input id="title" name="title" onChange={handleInputChange} />
+              <Label htmlFor="source">Source</Label>
+              <Input id="source" name="source" onChange={handleInputChange} />
+              {dataItems.map((item, index) => (
+                <div key={index}>
+                  <Input
+                    placeholder="label"
+                    value={item.label}
+                    onChange={(e) =>
+                      updateDataItem(index, "label", e.target.value)
+                    }
+                  />
+                  <Input
+                    placeholder="value"
+                    value={item.value}
+                    onChange={(e) =>
+                      updateDataItem(index, "value", e.target.value)
+                    }
+                  />
+                </div>
+              ))}
+              <Button onClick={addDataItem}>Add Data Item</Button>
+            </>
+          )}
+          {nodeType === "ai" && (
+            <>
+              <Label htmlFor="title">Title</Label>
+              <Input id="title" name="title" onChange={handleInputChange} />
+              <Label htmlFor="task">Task</Label>
+              <Input id="task" name="task" onChange={handleInputChange} />
+              <Label htmlFor="confidence">Confidence</Label>
+              <Slider
+                defaultValue={[50]}
+                max={100}
+                step={1}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({ ...prev, confidence: value[0] }))
+                }
+              />
+            </>
+          )}
+          {nodeType === "end" && (
+            <>
+              <Label htmlFor="title">Title</Label>
+              <Input id="title" name="title" onChange={handleInputChange} />
+              <Label htmlFor="outcome">Outcome</Label>
+              <Select
+                onValueChange={(value) =>
+                  setFormData((prev) => ({ ...prev, outcome: value }))
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select outcome" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Accepted">Accepted</SelectItem>
+                  <SelectItem value="Rejected">Rejected</SelectItem>
+                  <SelectItem value="Manual Review">Manual Review</SelectItem>
+                </SelectContent>
+              </Select>
             </>
           )}
           <Button onClick={addNode}>Confirm</Button>
@@ -411,9 +514,11 @@ function Flow() {
         nodes={nodes}
         nodeTypes={nodeTypes}
         onNodesChange={onNodesChangeWrapper}
+        onNodesDelete={onNodesDelete}
         edges={edges}
         edgeTypes={edgeTypes}
         onEdgesChange={onEdgesChange}
+        onEdgesDelete={onEdgesDelete}
         onConnect={onConnect}
         fitView
       >

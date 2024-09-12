@@ -4,6 +4,7 @@ import { PositionLoggerNode } from "./PositionLoggerNode";
 import { AppNode } from "./types";
 import ProgressNode from "../components/customNode";
 import { StatsNode } from "../components/customNode";
+import { AINode, DataNode, EndNode } from "../components/customNode";
 
 //To do:
 //1. Each node has a title htat is bolded
@@ -46,4 +47,7 @@ export const nodeTypes = {
   "position-logger": PositionLoggerNode, // Add any of your custom nodes here!
   ProgressNode: ProgressNode,
   StatsNode: StatsNode,
+  AINode: AINode,
+  DataNode: DataNode,
+  EndNode: EndNode,
 } satisfies NodeTypes;

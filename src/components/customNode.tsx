@@ -137,3 +137,120 @@ const StatsNode: React.FC<StatsNodeProps> = ({ data }) => {
 
 export default ProgressNode;
 export { StatsNode };
+interface DataNodeProps {
+  data: {
+    title: string;
+    source: string;
+    dataItems: { label: string; value: string }[];
+  };
+}
+
+const DataNode: React.FC<DataNodeProps> = ({ data }) => {
+  return (
+    <div className="custom-node data-node">
+      <Handle type="target" position={Position.Top} />
+      <Handle type="source" position={Position.Bottom} />
+
+      <div className="node-content">
+        <h3 className="node-title">{data.title}</h3>
+        <div className="node-info">
+          <span className="data-icon">📊</span>
+          <span className="source">{data.source}</span>
+        </div>
+
+        <hr className="divider" />
+
+        <div className="node-data-container">
+          {data.dataItems.map((item, index) => (
+            <div key={index} className="node-data-item">
+              <span className="data-label">{item.label}: </span>
+              <span className="data-value">{item.value}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+interface AINodeProps {
+  data: {
+    title: string;
+    task: string;
+    confidence: number;
+  };
+}
+
+const AINode: React.FC<AINodeProps> = ({ data }) => {
+  return (
+    <div className="custom-node ai-node">
+      <Handle type="target" position={Position.Top} />
+      <Handle type="source" position={Position.Bottom} />
+
+      <div className="node-content">
+        <h3 className="node-title">{data.title}</h3>
+        <div className="node-info">
+          <span className="ai-icon">🤖</span>
+          <span className="task">{data.task}</span>
+        </div>
+
+        <hr className="divider" />
+
+        <div className="confidence-section">
+          <div className="confidence-bar">
+            <div
+              className="confidence-fill"
+              style={{
+                width: `${data.confidence}%`,
+                backgroundColor: `hsl(${data.confidence * 1.2}, 70%, 50%)`,
+              }}
+            ></div>
+          </div>
+          <span className="confidence-text">
+            Confidence: {data.confidence}%
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+interface EndNodeProps {
+  data: {
+    title: string;
+    outcome: "Accepted" | "Rejected" | "Manual Review";
+  };
+}
+
+const EndNode: React.FC<EndNodeProps> = ({ data }) => {
+  const getOutcomeColor = (outcome: string) => {
+    switch (outcome) {
+      case "Accepted":
+        return "#2ecc71";
+      case "Rejected":
+        return "#e74c3c";
+      case "Manual Review":
+        return "#f39c12";
+      default:
+        return "#95a5a6";
+    }
+  };
+
+  return (
+    <div className="custom-node end-node">
+      <Handle type="target" position={Position.Top} />
+
+      <div className="node-content">
+        <h3 className="node-title">{data.title}</h3>
+        <div
+          className="outcome-tag"
+          style={{ backgroundColor: getOutcomeColor(data.outcome) }}
+        >
+          {data.outcome}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export { DataNode, AINode, EndNode };

@@ -1,4 +1,3 @@
-// instant.ts
 import { init, tx } from "@instantdb/react";
 import { debounce } from "lodash";
 import { Node, Edge } from "@xyflow/react";
@@ -14,18 +13,19 @@ export const db = init<Schema>({ appId: APP_ID });
 
 const debouncedUpdateNodes = debounce((nodes: Node[]) => {
   console.log("Call", nodes);
-  // const updatedNodes = nodes.map((node) => {
-  //   const { measured, ...rest } = node;
-  //   return rest;
-  // });
+  const updatedNodes = nodes.map((node) => {
+    const { measured, ...rest } = node;
+    return rest;
+  });
 
-  // console.log(updatedNodes);
-  db.transact(nodes.map((node) => tx.nodes[node.id].update(node)));
+  console.log(updatedNodes);
+  db.transact(updatedNodes.map((node) => tx.nodes[node.id].update(node)));
 }, 300);
 
 export function updateNodes(nodes: Node[]) {
   debouncedUpdateNodes(nodes);
 }
+
 export function updateEdges(edge: any) {
   if (!edge) return;
   console.log(edge);
@@ -51,6 +51,14 @@ export function addNodeDB(node: any) {
     selected: false,
   };
   db.transact([tx.nodes[id()].update(data)]);
+}
+
+export function deleteNodeDB(nodeId: string) {
+  db.transact([tx.nodes[nodeId].delete()]);
+}
+
+export function deleteEdgeDB(edgeId: string) {
+  db.transact([tx.edges[edgeId].delete()]);
 }
 
 export function cancelPendingUpdates() {
