@@ -8,6 +8,12 @@ import {
   useNodesState,
   useEdgesState,
   type OnConnect,
+  BaseEdge,
+  EdgeLabelRenderer,
+  EdgeProps,
+  getBezierPath,
+  Handle,
+  Position,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { Button } from "@/components/ui/button";
@@ -30,8 +36,65 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 
 import { nodeTypes } from "./nodes";
-import { edgeTypes } from "./edges";
 import { db, updateNodes, updateEdges, addNodeDB } from "./instant";
+
+const CustomDottedEdge: React.FC<EdgeProps> = ({
+  id,
+  sourceX,
+  sourceY,
+  targetX,
+  targetY,
+  sourcePosition,
+  targetPosition,
+  style = {},
+  markerEnd,
+  data = {},
+}) => {
+  const [edgePath, labelX, labelY] = getBezierPath({
+    sourceX,
+    sourceY,
+    sourcePosition,
+    targetX,
+    targetY,
+    targetPosition,
+  });
+
+  return (
+    <>
+      <BaseEdge
+        path={edgePath}
+        markerEnd={markerEnd}
+        style={{
+          ...style,
+          stroke: data.color as string,
+          strokeWidth: 2,
+          strokeDasharray: "5,5",
+        }}
+      />
+      <EdgeLabelRenderer>
+        <div
+          style={{
+            position: "absolute",
+            transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
+            background: "#ffffff",
+            padding: "4px",
+            borderRadius: "4px",
+            fontSize: 12,
+            fontWeight: 700,
+            pointerEvents: "all",
+          }}
+        >
+          {data.label as React.ReactNode}
+        </div>
+      </EdgeLabelRenderer>
+    </>
+  );
+};
+
+// Edge Types
+const edgeTypes = {
+  customDotted: CustomDottedEdge,
+};
 
 export default function App() {
   return <Flow />;
@@ -51,12 +114,19 @@ function Flow() {
 
   const [nodes, setNodes, onNodesChange] = useNodesState<any>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<any>([]);
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isNodeDialogOpen, setIsNodeDialogOpen] = React.useState(false);
+  const [isEdgeDialogOpen, setIsEdgeDialogOpen] = React.useState(false);
   const [nodeType, setNodeType] = React.useState<"progress" | "stats" | null>(
     null
   );
   const [formData, setFormData] = React.useState<any>({});
   const [dataItems, setDataItems] = React.useState<any[]>([]);
+
+  // New state for edge creation
+  const [sourceNode, setSourceNode] = React.useState<string | null>(null);
+  const [targetNode, setTargetNode] = React.useState<string | null>(null);
+  const [edgeColor, setEdgeColor] = React.useState("#000000");
+  const [edgeLabel, setEdgeLabel] = React.useState("");
 
   React.useEffect(() => {
     if (nodesData?.nodes) {
@@ -68,15 +138,48 @@ function Flow() {
   }, [nodesData, edgesData, setNodes, setEdges]);
 
   const onConnect: OnConnect = React.useCallback(
-    (connection) => {
+    (params) => {
+      const newEdge = {
+        ...params,
+        type: "customDotted",
+        data: {
+          label: edgeLabel || `Edge ${params.source}-${params.target}`,
+          color: edgeColor,
+        },
+      };
       setEdges((eds) => {
-        const newEdges = addEdge(connection, eds);
-        updateEdges(connection);
+        const newEdges = addEdge(newEdge, eds);
+        updateEdges(newEdge);
         return newEdges;
       });
     },
-    [setEdges]
+    [setEdges, edgeColor, edgeLabel]
   );
+
+  const createEdge = React.useCallback(() => {
+    if (sourceNode && targetNode) {
+      const newEdge = {
+        id: `edge-${sourceNode}-${targetNode}`,
+        source: sourceNode,
+        target: targetNode,
+        type: "customDotted",
+        data: {
+          label: edgeLabel || `Edge ${sourceNode}-${targetNode}`,
+          color: edgeColor,
+        },
+      };
+      setEdges((eds) => {
+        const newEdges = addEdge(newEdge, eds);
+        updateEdges(newEdge);
+        return newEdges;
+      });
+      setIsEdgeDialogOpen(false);
+      setSourceNode(null);
+      setTargetNode(null);
+      setEdgeColor("#000000");
+      setEdgeLabel("");
+    }
+  }, [sourceNode, targetNode, edgeColor, edgeLabel, setEdges]);
 
   const onNodesChangeWrapper = React.useCallback(
     (changes) => {
@@ -121,7 +224,7 @@ function Flow() {
       addNodeDB(newNode);
     }
 
-    setIsOpen(false);
+    setIsNodeDialogOpen(false);
     setNodeType(null);
     setFormData({});
     setDataItems([]);
@@ -160,10 +263,7 @@ function Flow() {
 
   return (
     <div style={{ width: "100%", height: "100vh" }}>
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogTrigger asChild>
-          <Button className="absolute top-4 left-4 z-10">Add Node</Button>
-        </DialogTrigger>
+      <Dialog open={isNodeDialogOpen} onOpenChange={setIsNodeDialogOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Add New Node</DialogTitle>
@@ -247,6 +347,66 @@ function Flow() {
           <Button onClick={addNode}>Confirm</Button>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={isEdgeDialogOpen} onOpenChange={setIsEdgeDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create New Edge</DialogTitle>
+          </DialogHeader>
+          <Select onValueChange={(value) => setSourceNode(value)}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select source node" />
+            </SelectTrigger>
+            <SelectContent>
+              {nodes.map((node) => (
+                <SelectItem key={node.id} value={node.id}>
+                  {node.data.title || node.id}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select onValueChange={(value) => setTargetNode(value)}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select target node" />
+            </SelectTrigger>
+            <SelectContent>
+              {nodes.map((node) => (
+                <SelectItem key={node.id} value={node.id}>
+                  {node.data.title || node.id}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Label htmlFor="edgeColor">Edge Color</Label>
+          <Input
+            id="edgeColor"
+            type="color"
+            value={edgeColor}
+            onChange={(e) => setEdgeColor(e.target.value)}
+          />
+          <Label htmlFor="edgeLabel">Edge Label</Label>
+          <Input
+            id="edgeLabel"
+            value={edgeLabel}
+            onChange={(e) => setEdgeLabel(e.target.value)}
+          />
+          <Button onClick={createEdge}>Create Edge</Button>
+        </DialogContent>
+      </Dialog>
+
+      <Button
+        className="absolute top-4 left-4 z-10"
+        onClick={() => setIsNodeDialogOpen(true)}
+      >
+        Add Node
+      </Button>
+      <Button
+        className="absolute top-4 left-40 z-10"
+        onClick={() => setIsEdgeDialogOpen(true)}
+      >
+        Create Edge
+      </Button>
+
       <ReactFlow
         nodes={nodes}
         nodeTypes={nodeTypes}
