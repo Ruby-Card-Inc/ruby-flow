@@ -2,7 +2,8 @@ import type { NodeTypes } from "@xyflow/react";
 export { default as CustomNode } from "../components/customNode";
 import { PositionLoggerNode } from "./PositionLoggerNode";
 import { AppNode } from "./types";
-import CustomNode from "../components/customNode";
+import ProgressNode from "../components/customNode";
+import { StatsNode } from "../components/customNode";
 
 //To do:
 //1. Each node has a title htat is bolded
@@ -13,7 +14,7 @@ import CustomNode from "../components/customNode";
 export const initialNodes: any[] = [
   {
     id: "1",
-    type: "customNode",
+    type: "ProgressNode",
     position: { x: 0, y: 0 },
     data: {
       title: "Custom Node",
@@ -23,9 +24,26 @@ export const initialNodes: any[] = [
       status: "in progress",
     },
   },
+  {
+    id: "2",
+    type: "StatsNode",
+    position: { x: 0, y: 0 },
+    data: {
+      title: "Custom Node",
+      meter: 75,
+      source: "API",
+      method: "GET",
+      dataItems: [
+        { time: "15:30", data: "1.23 MB", change: 5.4 },
+        { time: "16:00", data: "1.45 MB", change: -2.1 },
+        { time: "16:30", data: "1.37 MB", change: 3.8 },
+      ],
+    },
+  },
 ];
 
 export const nodeTypes = {
   "position-logger": PositionLoggerNode, // Add any of your custom nodes here!
-  customNode: CustomNode,
+  ProgressNode: ProgressNode,
+  StatsNode: StatsNode,
 } satisfies NodeTypes;

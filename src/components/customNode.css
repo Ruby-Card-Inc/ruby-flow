@@ -57,3 +57,87 @@
 .status-tag.done {
   background: #90ee90;
 }
+.custom-node {
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+  background: white;
+  width: 300px;
+  font-family: Arial, sans-serif;
+}
+
+.node-title {
+  font-weight: bold;
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.node-info {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+.meter-icon {
+  margin-right: 5px;
+}
+
+.source {
+  font-weight: bold;
+}
+
+.dot {
+  margin: 0 5px;
+}
+
+.method {
+  color: #666;
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid #eee;
+  margin: 10px 0;
+}
+
+.node-data-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.node-data-item {
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.node-data-item:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2px;
+}
+
+.stat-label {
+  font-size: 10px;
+  color: #666;
+}
+
+.stat-value {
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.stat-value.positive {
+  color: green;
+}
+
+.stat-value.negative {
+  color: red;
+}
