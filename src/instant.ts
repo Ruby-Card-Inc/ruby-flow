@@ -69,3 +69,23 @@ export function deleteEdgeDB(edgeId: string) {
 export function cancelPendingUpdates() {
   debouncedUpdateNodes.cancel();
 }
+
+export function getAllNodes() {
+  const {
+    isLoading: nodesLoading,
+    error: nodesError,
+    data: nodesData,
+  } = db.useQuery({ nodes: {} });
+
+  return nodesData;
+}
+
+export function getAllEdges() {
+  const {
+    isLoading: edgesLoading,
+    error: edgesError,
+    data: edgesData,
+  } = db.useQuery({ edges: {} });
+
+  return edgesData;
+}

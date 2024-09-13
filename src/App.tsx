@@ -16,6 +16,7 @@ import {
   Position,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
+import { MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -38,6 +39,7 @@ import { Slider } from "@/components/ui/slider";
 import { nodeTypes } from "./nodes";
 import { db, updateNodes, updateEdges, addNodeDB } from "./instant";
 import { deleteNodeDB, deleteEdgeDB } from "./instant";
+import { ChatModal } from "./components/chatModal";
 const CustomDottedEdge: React.FC<EdgeProps> = ({
   id,
   sourceX,
@@ -127,6 +129,7 @@ function Flow() {
   const [targetNode, setTargetNode] = React.useState<string | null>(null);
   const [edgeColor, setEdgeColor] = React.useState("#000000");
   const [edgeLabel, setEdgeLabel] = React.useState("");
+  const [isChatOpen, setIsChatOpen] = React.useState(false);
 
   React.useEffect(() => {
     if (nodesData?.nodes) {
@@ -512,6 +515,14 @@ function Flow() {
       >
         Create Edge
       </Button>
+      <Button
+        className="absolute top-4 right-4 z-10"
+        onClick={() => setIsChatOpen(true)}
+      >
+        <MessageSquare className="mr-2 h-4 w-4" />
+        Chat
+      </Button>
+      <ChatModal isOpen={isChatOpen} setIsOpen={setIsChatOpen} />
 
       <ReactFlow
         nodes={nodes}
